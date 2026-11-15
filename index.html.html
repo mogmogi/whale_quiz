@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>איזה סוג לווייתן אתה? 🐋</title>
+  <!-- טעינת גופנים בעברית: Heebo ו-Assistant -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <!-- טעינת Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Heebo', 'Assistant', 'sans-serif'],
+          },
+          colors: {
+            abyss: '#040d1a',
+            deepOcean: '#071930',
+            biolum: '#38bdf8',
+            biolumTeal: '#2dd4bf',
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-slow': 'pulse 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* עיצוב רקע אוקייני עמוק ואנימציות אור ובועות */
+    body {
+      background: radial-gradient(circle at 50% 0%, #0d2b52 0%, #061529 55%, #020813 100%);
+      min-height: 100vh;
+      color: #f0f9ff;
+      overflow-x: hidden;
+      font-family: 'Heebo', 'Assistant', sans-serif;
+    }
+
+    /* קרני אור תת-ימיות */
+    .light-rays {
+      position: fixed;
+      top: -20%;
+      left: 0;
+      right: 0;
+      height: 80vh;
+      background: conic-gradient(
+        from 160deg at 50% 0%,
+        transparent 0deg,
+        rgba(56, 189, 248, 0.06) 15deg,
+        transparent 30deg,
+        rgba(45, 212, 191, 0.05) 45deg,
+        transparent 60deg
+      );
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(24px);
+    }
+
+    /* אפקט זכוכית (Glassmorphism) */
+    .glass-card {
+      background: rgba(11, 31, 58, 0.62);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(125, 211, 252, 0.16);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .option-btn {
+      background: rgba(15, 42, 76, 0.55);
+      border: 1px solid rgba(125, 211, 252, 0.18);
+      transition: all 0.22s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .option-btn:hover {
+      background: rgba(24, 65, 114, 0.78);
+      border-color: rgba(56, 189, 248, 0.55);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.18);
+    }
+
+    .option-btn:active {
+      transform: scale(0.99);
+    }
+
+    /* בועות צפות עדינות ברקע */
+    .bubble {
+      position: fixed;
+      bottom: -30px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.35), rgba(56, 189, 248, 0.08));
+      pointer-events: none;
+      z-index: 0;
+      animation: rise linear infinite;
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+      15% {
+        opacity: 0.45;
+      }
+      85% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateY(-110vh) translateX(25px);
+        opacity: 0;
+      }
+    }
+
+    /* אנימציית כניסה חלקה למסכים */
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body class="relative flex flex-col items-center justify-center px-4 py-8 sm:py-12 selection:bg-sky-500/30 selection:text-sky-100">
+
+  <!-- אלמנטים דקורטיביים ברקע -->
+  <div class="light-rays"></div>
+  <div id="bubbles-container" aria-hidden="true"></div>
+
+  <!-- כפתור שליטה בסאונד האוקייני הצף בפינה העליונה -->
+  <button id="audio-toggle-btn" onclick="toggleAudio()" aria-label="הפעל או השתק סאונד רקע" title="סאונד מעמקים ולווייתנים" class="fixed top-4 left-4 sm:top-6 sm:left-6 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-full glass-card border border-sky-400/25 text-sky-100 hover:border-teal-400/50 hover:bg-sky-900/60 transition-all duration-200 shadow-lg cursor-pointer">
+    <span id="audio-pulse-dot" class="hidden w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
+    <svg id="icon-sound-off" class="w-5 h-5 text-sky-300/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+    </svg>
+    <svg id="icon-sound-on" class="hidden w-5 h-5 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+    </svg>
+    <span id="audio-status-label" class="text-xs font-medium hidden sm:inline">סאונד כבוי</span>
+  </button>
+
+  <!-- מיכל ראשי -->
+  <main class="relative z-10 w-full max-w-xl mx-auto">
+
+    <!-- מסך פתיחה (Welcome Screen) -->
+    <section id="welcome-screen" class="glass-card rounded-3xl p-7 sm:p-10 text-center fade-in">
+      <div class="inline-flex items-center justify-center w-28 h-20 rounded-2xl bg-sky-500/15 border border-sky-400/25 mb-6 animate-float p-2">
+        <!-- צללית ריאליסטית של לווייתן גדול-סנפיר -->
+        <svg class="w-full h-full text-sky-300" viewBox="0 0 180 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 52C22 36 52 24 94 28C122 31 142 43 158 30C162 27 170 22 172 27C174 31 163 41 159 46C166 49 175 56 170 60C165 64 156 55 150 51C133 64 102 72 70 70C44 68 15 64 18 52Z" fill="currentColor" fill-opacity="0.28" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <!-- סנפיר חזה ארוך אופייני -->
+          <path d="M76 62C64 80 46 93 38 91C32 89 48 71 60 60" fill="currentColor" fill-opacity="0.4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <!-- סנפיר גב קטן -->
+          <path d="M114 31C117 25 121 25 123 32" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- סילון מים עדין -->
+          <path d="M52 24C50 16 44 13 40 15M56 24C58 16 64 13 68 15" stroke="#2dd4bf" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <span class="inline-block text-xs sm:text-sm font-semibold tracking-wider text-teal-300 bg-teal-400/10 border border-teal-400/20 px-3.5 py-1 rounded-full mb-4">
+        שאלון אישיות תת-ימי
+      </span>
+
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+        איזה סוג לווייתן אתה?
+      </h1>
+
+      <p class="text-sky-100/80 text-base sm:text-lg leading-relaxed mb-8 max-w-md mx-auto">
+        לכל יצור באוקיינוס יש תדר משלו – יש את הנודדים המוזיקליים, הצוללנים המופנמים, האסטרטגים השבטיים והענקים השקטים. 7 שאלות קצרות יגלו איזה לווייתן שוחה בך.
+      </p>
+
+      <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-l from-sky-500 to-teal-400 hover:from-sky-400 hover:to-teal-300 text-slate-950 font-bold text-lg shadow-lg shadow-sky-500/25 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95 cursor-pointer">
+        צלול פנימה — התחל שאלון
+      </button>
+
+      <p class="text-xs text-sky-200/45 mt-5">
+        לוקח בערך דקה • בסוף אפשר לשתף תוצאה ישר לוואטסאפ
+      </p>
+    </section>
+
+    <!-- מסך שאלות (Quiz Screen) -->
+    <section id="quiz-screen" class="hidden glass-card rounded-3xl p-6 sm:p-9 fade-in">
+      <!-- סרגל התקדמות עליון -->
+      <div class="flex items-center justify-between text-xs sm:text-sm text-sky-200/75 mb-2.5">
+        <span id="question-counter" class="font-semibold">שאלה 1 מתוך 7</span>
+        <span id="progress-percent" class="text-teal-300 font-medium">14%</span>
+      </div>
+      <div class="w-full h-2 bg-slate-900/80 rounded-full overflow-hidden mb-7 border border-sky-400/10">
+        <div id="progress-bar" class="h-full bg-gradient-to-l from-teal-400 to-sky-400 rounded-full transition-all duration-300" style="width: 14.2%"></div>
+      </div>
+
+      <!-- טקסט השאלה -->
+      <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-white leading-snug mb-6">
+        <!-- יוזן דינמית -->
+      </h2>
+
+      <!-- אפשרויות בחירה -->
+      <div id="options-container" class="space-y-3.5">
+        <!-- יוזן דינמית -->
+      </div>
+
+      <!-- כפתור חזרה לשאלה קודמת -->
+      <div class="mt-7 pt-4 border-t border-sky-300/10 flex items-center justify-between">
+        <button id="back-btn" onclick="prevQuestion()" class="inline-flex items-center gap-1.5 text-sm text-sky-200/70 hover:text-white transition-colors py-2 px-3 rounded-xl hover:bg-white/5 cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+          <span>חזרה לשאלה הקודמת</span>
+        </button>
+        <span class="text-xs text-sky-300/40">בחר את התשובה שהכי מרגישה כמוך</span>
+      </div>
+    </section>
+
+    <!-- מסך תוצאה (Result Screen) -->
+    <section id="result-screen" class="hidden glass-card rounded-3xl p-6 sm:p-9 fade-in">
+      <div class="text-center">
+        <span class="inline-block text-xs font-semibold tracking-wider text-teal-300 bg-teal-400/10 border border-teal-400/20 px-3.5 py-1 rounded-full mb-4">
+          התוצאה שלך
+        </span>
+
+        <!-- איור SVG של הלווייתן הנבחר -->
+        <div id="result-illustration" class="w-56 h-32 mx-auto mb-4 flex items-center justify-center animate-float">
+          <!-- יוזן דינמית -->
+        </div>
+
+        <h2 id="result-title" class="text-2xl sm:text-3xl font-extrabold text-white mb-1">
+          <!-- שם הלווייתן -->
+        </h2>
+        <p id="result-subtitle" class="text-sm sm:text-base text-sky-300/80 font-medium mb-5">
+          <!-- תת כותרת -->
+        </p>
+
+        <!-- תגיות תכונות ליבה -->
+        <div id="result-traits" class="flex flex-wrap items-center justify-center gap-2 mb-6">
+          <!-- תגיות יוזנו דינמית -->
+        </div>
+      </div>
+
+      <!-- תיאור מפורט + קישור לויקיפדיה -->
+      <div class="bg-slate-950/45 border border-sky-400/15 rounded-2xl p-5 sm:p-6 mb-5 text-right space-y-3">
+        <p id="result-description" class="text-sky-50/90 text-sm sm:text-base leading-relaxed">
+          <!-- יוזן דינמית -->
+        </p>
+        <div class="pt-3 border-t border-sky-300/10">
+          <p class="text-xs font-semibold text-teal-300 uppercase tracking-wide mb-1">התדר שלך במים:</p>
+          <p id="result-vibe" class="text-sm text-sky-200/85 leading-relaxed">
+            <!-- יוזן דינמית -->
+          </p>
+        </div>
+        <div class="pt-3 border-t border-sky-300/10 flex justify-start">
+          <a id="wiki-link" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-sky-300 hover:text-teal-300 bg-sky-400/10 hover:bg-sky-400/20 border border-sky-400/25 px-3.5 py-2 rounded-xl transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+            <span>קרא עוד בויקיפדיה</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- כפתורי שיתוף והורדה -->
+      <div class="space-y-3">
+        <!-- העתקה לוואטסאפ -->
+        <button onclick="copyShareText()" class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-l from-teal-400 to-sky-400 hover:from-teal-300 hover:to-sky-300 text-slate-950 font-bold text-base shadow-lg shadow-teal-500/20 flex items-center justify-center gap-2.5 transition-all transform hover:-translate-y-0.5 active:scale-95 cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          </svg>
+          <span>העתק תוצאה לשיתוף בוואטסאפ</span>
+        </button>
+
+        <!-- כפתור שיתוף מערכת (מוצג במכשירים תומכים כמו מובייל) -->
+        <button id="native-share-btn" onclick="nativeShare()" class="hidden w-full py-3 px-5 rounded-2xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-400/35 text-sky-100 font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+          </svg>
+          <span>שתף ישירות עם חברים</span>
+        </button>
+
+        <!-- שורת פעולות משנית: הורדת קובץ + התחלה מחדש -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+          <button onclick="downloadQuizHtml()" class="py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-sky-300/15 text-sky-200 text-sm font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer">
+            <svg class="w-4 h-4 text-sky-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span>הורד כקובץ HTML להפצה</span>
+          </button>
+
+          <button onclick="restartQuiz()" class="py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-sky-300/15 text-sky-200 text-sm font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer">
+            <svg class="w-4 h-4 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>עשה את השאלון שוב</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- הודעת Toast צפה לאישור העתקה -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform translate-y-3">
+    <div class="bg-slate-900/95 border border-teal-400/40 text-teal-100 px-5 py-3 rounded-2xl shadow-2xl text-sm font-medium flex items-center gap-2.5 backdrop-blur-md">
+      <span class="text-lg">🐋</span>
+      <span id="toast-message">התוצאה הועתקה! עכשיו אפשר להדביק בוואטסאפ</span>
+    </div>
+  </div>
+
+  <script>
+    // --- מאגר השאלות והניקוד לכל ארכיטיפ ---
+    // מפתחות הלווייתנים: humpback, orca, sperm, blue, beluga
+    // בכל שאלה יש 5 אפשרויות – אחת מדויקת לכל מין, כך שלכל 5 הלווייתנים יש ניקוד מקסימלי זהה לחלוטין
+    const questions = [
+      {
+        question: "איך נראה הטיול או החופשה האידיאלית שלך?",
+        options: [
+          {
+            id: "q1_o",
+            text: "טיול מתוכנן היטב עם הגרעין הקרוב של החברים – חוויות משותפות, תיאום מושלם ותחושת שבט",
+            scores: { orca: 3 }
+          },
+          {
+            id: "q1_s",
+            text: "מקום שקט ומרוחק מהמולת העיר, עם מרחב לצלול למחשבות, ספר טוב ונוף אינסופי",
+            scores: { sperm: 3 }
+          },
+          {
+            id: "q1_h",
+            text: "מסע פתוח וארוך – לצאת לבד או עם תיק על הגב, לפגוש אנשים מעניינים בדרך ולהמשיך הלאה בקצב שלי",
+            scores: { humpback: 3 }
+          },
+          {
+            id: "q1_be",
+            text: "יעד תוסס ומלא חיים – בתי קפה, שיחות ספונטניות עם זרים, תנועה וצחוק בכל פינה",
+            scores: { beluga: 3 }
+          },
+          {
+            id: "q1_bl",
+            text: "מרחב טבע פתוח ורחב ידיים בלי לו״ז צפוף – פשוט לנשום עמוק ולנוע לאט בקצב של הגוף",
+            scores: { blue: 3 }
+          }
+        ]
+      },
+      {
+        question: "איזה סוג של מוזיקה או סאונד הכי תופס אותך ומזיז אצלך משהו?",
+        options: [
+          {
+            id: "q2_bl",
+            text: "סאונד רחב, עוטף ומונומנטלי עם נוכחות אדירה – יצירות גדולות מהחיים שמרגישים אותן בכל הגוף",
+            scores: { blue: 3 }
+          },
+          {
+            id: "q2_h",
+            text: "מוזיקה עשירה ומלודית שמתפתחת ולוקחת למסע רגשי – כזו שכיף לעצום איתה עיניים או לזוז איתה בחופשיות",
+            scores: { humpback: 3 }
+          },
+          {
+            id: "q2_be",
+            text: "שירים קלילים, קצביים ושמחים שעושים טוב על הלב, כיף לשיר איתם בקול ולהרים את האווירה עם חברים",
+            scores: { beluga: 3 }
+          },
+          {
+            id: "q2_o",
+            text: "קצב חד, מדויק ועוצמתי שמכניס לפוקוס, מרים את האנרגיה ומניע לפעולה",
+            scores: { orca: 3 }
+          },
+          {
+            id: "q2_s",
+            text: "צלילים עמוקים, מינימליסטיים או אינסטרומנטליים – מוזיקה שמאפשרת לצלול פנימה לתוך המחשבות והשקט",
+            scores: { sperm: 3 }
+          }
+        ]
+      },
+      {
+        question: "איך נראית זוגיות ואינטימיות בריאה בעיניך?",
+        options: [
+          {
+            id: "q3_s",
+            text: "חיבור שקט, עמוק ואינטימי של אחד-על-אחד – בלי צורך בהפגנתיות, עם מרחב אמיתי לנפש",
+            scores: { sperm: 3 }
+          },
+          {
+            id: "q3_o",
+            text: "שותפות חזקה, מחויבות ונאמנות מוחלטת – בונים יחד בית ושבט משותף לכל החיים",
+            scores: { orca: 3 }
+          },
+          {
+            id: "q3_be",
+            text: "חברות קרובה, המון הומור, תקשורת פתוחה ויומיומית וקלילות שגורמת להרגיש בבית",
+            scores: { beluga: 3 }
+          },
+          {
+            id: "q3_h",
+            text: "ריקוד עדין בין קרבה עמוקה לבין חופש אישי – שני אנשים שלמים שנודדים יחד בלי לאבד את העצמאות",
+            scores: { humpback: 3 }
+          },
+          {
+            id: "q3_bl",
+            text: "נוכחות רגועה, יציבה ולא לוחצת – פשוט להיות זה לצד זה בשלווה ובביטחון בלי דרמות",
+            scores: { blue: 3 }
+          }
+        ]
+      },
+      {
+        question: "את/ה באירוע חברתי או מפגש עם הרבה אנשים. איפה נמצא אותך?",
+        options: [
+          {
+            id: "q4_s",
+            text: "בפינה נינוחה או בשיחת עומק של אחד-על-אחד – פחות בקטע של סמול-טוק שטחי",
+            scores: { sperm: 3 }
+          },
+          {
+            id: "q4_bl",
+            text: "פשוט סופג/ת את האווירה בשלווה – לא ממהר/ת לשום מקום, נוכח/ת ושקט/ה",
+            scores: { blue: 3 }
+          },
+          {
+            id: "q4_o",
+            text: "במרכז העניינים עם החבורה שלי – שומר/ת על קשר עין, מוביל/ה את הווייב ודואג/ת שכולם בעניינים",
+            scores: { orca: 3 }
+          },
+          {
+            id: "q4_h",
+            text: "נע/ה בחופשיות – רגע אחד בתוך ההתרחשות, רגע אחר בשיחה מסקרנת עם מישהו חדש לגמרי",
+            scores: { humpback: 3 }
+          },
+          {
+            id: "q4_be",
+            text: "מדלג/ת בין קבוצות, צוחק/ת, מכיר/ה אנשים חדשים ומחבר/ת בין כולם",
+            scores: { beluga: 3 }
+          }
+        ]
+      },
+      {
+        question: "כשעובר עליך משהו מורכב או עמוס רגשית, איך את/ה מעבד/ת את זה?",
+        options: [
+          {
+            id: "q5_be",
+            text: "מדבר/ת על זה בפתיחות ובקלילות עם חברים – עצם השיתוף כבר משחרר את הלחץ",
+            scores: { beluga: 3 }
+          },
+          {
+            id: "q5_s",
+            text: "צולל/ת עמוק פנימה לשקט מוחלט – לוקח/ת מרחק כדי לנתח ולהבין הכל לבד לפני שמשתפ/ת",
+            scores: { sperm: 3 }
+          },
+          {
+            id: "q5_o",
+            text: "מתייעצ/ת עם האנשים הקרובים אליי ביותר – חשיבה משותפת ופתרון פרקטי",
+            scores: { orca: 3 }
+          },
+          {
+            id: "q5_h",
+            text: "יוצא/ת לתנועה – הליכה ארוכה, ספורט, ים או מוזיקה שמאפשרת לרגש לזרום החוצה",
+            scores: { humpback: 3 }
+          },
+          {
+            id: "q5_bl",
+            text: "נותן/ת לזמן לעשות את שלו בסבלנות – נושם/ת עמוק ושומר/ת על יציבות פנימית בלי להיבהל",
+            scores: { blue: 3 }
+          }
+        ]
+      },
+      {
+        question: "איך החברים הכי טובים שלך היו מתארים את סגנון התקשורת שלך?",
+        options: [
+          {
+            id: "q6_be",
+            text: "חם/ה, תקשורתי/ת ומלא/ת הומור – תמיד יש לך סיפור טוב או הודעה קולית",
+            scores: { beluga: 3 }
+          },
+          {
+            id: "q6_o",
+            text: "חד/ה, ישיר/ה ומדויק/ת – אומר/ת את הדברים כמו שהם בלי ללכת סחור-סחור",
+            scores: { orca: 3 }
+          },
+          {
+            id: "q6_bl",
+            text: "שקט/ה ויציב/ה – לא מדבר/ת סתם, אבל כשכבר אומר/ת משהו, כולם מקשיבים",
+            scores: { blue: 3 }
+          },
+          {
+            id: "q6_h",
+            text: "סקרן/ית, אקספרסיבי/ת ומפתיע/ה – יודע/ת להקשיב לעומק אבל גם להביא זווית מקורית",
+            scores: { humpback: 3 }
+          },
+          {
+            id: "q6_s",
+            text: "תמציתי/ת וענייני/ת – מעדיפ/ה שיחות עומק משמעותיות על פני הודעות יומיומיות בלתי פוסקות",
+            scores: { sperm: 3 }
+          }
+        ]
+      },
+      {
+        question: "מה הכי מדויק לגבי הצורך שלך בעצמאות מול שייכות?",
+        options: [
+          {
+            id: "q7_s",
+            text: "נוח לי מאוד לבד בעולמות הפנימיים שלי, כל עוד יש לי את השקט לבחור מתי לצאת החוצה",
+            scores: { sperm: 3 }
+          },
+          {
+            id: "q7_be",
+            text: "אני פורח/ת כשאני מוקפ/ת באנשים טובים, שיח פתוח ואנרגיה קהילתית חמה",
+            scores: { beluga: 3 }
+          },
+          {
+            id: "q7_h",
+            text: "זקוק/ה לחופש מוחלט ולמרחב תנועה, ובמקביל נהנה/ית מחיבורים ספונטניים ומשמעותיים בדרך",
+            scores: { humpback: 3 }
+          },
+          {
+            id: "q7_o",
+            text: "המשפחה והחברים הקרובים הם העוגן שלי – נאמנות הדדית מעל הכל",
+            scores: { orca: 3 }
+          },
+          {
+            id: "q7_bl",
+            text: "אני שלם/ה עם עצמי בכל מצב – נע/ה בקצב עצמאי ורגוע, ונהנה/ית מחברה כשזה קורה בטבעיות",
+            scores: { blue: 3 }
+          }
+        ]
+      }
+    ];
+
+    // --- הגדרת 5 סוגי הלווייתנים ---
+    const whales = {
+      humpback: {
+        title: "לווייתן גדול-סנפיר",
+        subtitle: "Humpback Whale • הנודד המוזיקלי והסקרן",
+        emoji: "🐋",
+        wikiUrl: "https://he.wikipedia.org/wiki/%D7%92%D7%93%D7%95%D7%9C-%D7%A1%D7%A0%D7%A4%D7%99%D7%A8",
+        traits: ["עצמאי וסקרן", "רגישות מוזיקלית", "אקרובטי ומשחקי", "אמפתיה גבוהה"],
+        description: "את/ה שילוב נדיר של נודד/ת חופשי/יה שמעריכ/ה מרחב ועצמאות, יחד עם סקרנות עמוקה כלפי העולם ואנשים. בדיוק כמו שירת הלווייתנים המורכבת של גדול-הסנפיר, יש לך חיבור רגשי ואמנותי לתדרים, מוזיקה ואווירה. את/ה יודע/ת ליצור חיבורים משמעותיים בדרך, לקפוץ לגובה כשיש אנרגיה טובה, אבל תמיד לשמור על הנפרדות והקצב הפנימי שלך.",
+        vibe: "תנועה חופשית בין מרחבים פתוחים, סקרנות בריאה, ורגישות גבוהה לסאונד ולאנרגיה שסביבך.",
+        svg: `
+          <svg viewBox="0 0 260 150" class="w-full h-full drop-shadow-[0_10px_22px_rgba(56,189,248,0.38)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="humpBody" x1="25" y1="30" x2="225" y2="105" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#1e3a8a"/>
+                <stop offset="0.55" stop-color="#0f294a"/>
+                <stop offset="1" stop-color="#081a33"/>
+              </linearGradient>
+              <linearGradient id="humpBelly" x1="30" y1="68" x2="155" y2="95" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#bae6fd"/>
+                <stop offset="1" stop-color="#38bdf8" stop-opacity="0.45"/>
+              </linearGradient>
+            </defs>
+            <!-- גוף מרכזי עם גב מקומר וסנפיר גב קטן -->
+            <path d="M22 66C24 52 44 43 76 41C106 39 132 42 150 45L156 38C159 35 163 36 164 42L166 49C186 55 204 62 218 52C225 46 237 37 242 42C246 47 233 60 227 65C236 69 248 78 242 83C236 88 224 77 217 72C196 84 162 94 118 95C76 96 34 86 22 66Z" fill="url(#humpBody)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- גחון בהיר עם קפלי גרון (Ventral pleats) -->
+            <path d="M25 69C44 84 82 93 125 92C102 84 72 78 44 73L25 69Z" fill="url(#humpBelly)"/>
+            <path d="M36 74C58 80 82 84 106 85M43 79C63 84 85 87 104 88M52 84C69 88 86 90 100 91" stroke="#e0f2fe" stroke-width="1.2" stroke-linecap="round" opacity="0.75"/>
+            <!-- בליטות אופייניות על הראש (Tubercles) -->
+            <circle cx="38" cy="51" r="1.4" fill="#93c5fd"/>
+            <circle cx="46" cy="48" r="1.4" fill="#93c5fd"/>
+            <circle cx="55" cy="46" r="1.4" fill="#93c5fd"/>
+            <!-- סנפיר חזה ארוך מאוד ולבן בחלקו התחתון אופייני לגדול-סנפיר -->
+            <path d="M98 78C86 104 64 132 52 135C44 137 46 126 56 112C66 98 76 85 84 76" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- חריצים בקצה סנפיר החזה -->
+            <path d="M56 112L52 115M63 102L59 105M70 92L66 95" stroke="#0284c7" stroke-width="1.4" stroke-linecap="round"/>
+            <!-- עין -->
+            <circle cx="56" cy="64" r="2.2" fill="#f0f9ff"/>
+          </svg>
+        `
+      },
+      orca: {
+        title: "אורקה (קטלן)",
+        subtitle: "Orca • המנהיג השבטי והאסטרטגי",
+        emoji: "🐬",
+        wikiUrl: "https://he.wikipedia.org/wiki/%D7%A7%D7%98%D7%9C%D7%9F",
+        traits: ["נאמנות שבטית", "חדות ואסטרטגיה", "נוכחות כריזמטית", "תיאום והובלה"],
+        description: "את/ה יצור חברתי מתוחכם עם אינטליגנציה חדה וגבולות ברורים. בניגוד ללווייתנים שנודדים לבד, האורקות חיות בלהקות מלוכדות לכל החיים – וגם אצלך המעגל הקרוב הוא ערך עליון. יש לך ראייה חדה של המציאות, יכולת לקרוא סיטואציות במהירות, וכריזמה טבעית שגורמת לאנשים לסמוך עליך.",
+        vibe: "פוקוס חד, נאמנות עמוקה לאנשים שלך, ותנועה מתואמת ומדויקת במרחב.",
+        svg: `
+          <svg viewBox="0 0 260 150" class="w-full h-full drop-shadow-[0_10px_22px_rgba(45,212,191,0.34)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- גוף שחור מבריק עם סנפיר גב גבוה וזקוף -->
+            <path d="M22 78C26 56 58 43 104 44L116 12C118 8 123 9 124 14L129 45C158 50 184 61 206 50C214 45 226 36 232 41C236 45 223 58 217 64C226 68 238 77 232 82C226 86 214 76 207 71C182 86 138 95 88 94C48 93 20 88 22 78Z" fill="#090d16" stroke="#5eead4" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- כתם לבן אליפטי ליד העין (Eye patch) -->
+            <ellipse cx="64" cy="60" rx="13" ry="5.5" transform="rotate(-10 64 60)" fill="#f8fafc"/>
+            <!-- כתם אוכף אפור-לבן מאחורי סנפיר הגב (Saddle patch) -->
+            <path d="M130 48C138 49 146 53 150 58C142 60 134 58 129 53L130 48Z" fill="#94a3b8" opacity="0.65"/>
+            <!-- גחון לבן מתעקל למעלה בצד הגוף -->
+            <path d="M28 82C54 91 96 93 136 86C148 83 158 76 164 72C152 74 138 78 122 81C86 85 52 84 28 82Z" fill="#f8fafc"/>
+            <!-- סנפיר חזה מעוגל ורחב (Paddle-shaped pectoral fin) -->
+            <path d="M88 83C82 102 68 114 58 111C50 108 58 92 72 82" fill="#090d16" stroke="#5eead4" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- קו פה ועין -->
+            <path d="M25 75C34 76 44 75 51 73" stroke="#94a3b8" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="47" cy="66" r="2" fill="#5eead4"/>
+          </svg>
+        `
+      },
+      sperm: {
+        title: "ראשתן גדול-ראש",
+        subtitle: "Sperm Whale • הצוללן העמוק והמופנם",
+        emoji: "🐳",
+        wikiUrl: "https://he.wikipedia.org/wiki/%D7%A8%D7%90%D7%A9%D7%AA%D7%9F_%D7%92%D7%93%D7%95%D7%9C-%D7%A8%D7%90%D7%A9",
+        traits: ["חשיבה עמוקה", "נוחות בשקט", "תקשורת מדויקת", "עולם פנימי עשיר"],
+        description: "את/ה לא מפחד/ת מהעומק – להפך, שם את/ה מרגיש/ה הכי בבית. הראשתן מסוגל לצלול לעומקים חשוכים ושקטים שאף יונק אחר לא מגיע אליהם, ובדיוק כך גם את/ה יודע/ת לשהות במחשבות, לחקור לעומק נושאים שמעניינים אותך ולא להיבהל מרגעים של לבד. התקשורת שלך היא כמו נקישות סונאר מדויקות: בלי רעש מיותר, ישר לעניין.",
+        vibe: "צלילה לעומק מתחת לפני השטח, בהירות מחשבתית, ושקט פנימי שלא תלוי ברעש חיצוני.",
+        svg: `
+          <svg viewBox="0 0 260 150" class="w-full h-full drop-shadow-[0_10px_22px_rgba(129,140,248,0.38)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="spermBody" x1="22" y1="34" x2="235" y2="95" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#334155"/>
+                <stop offset="0.5" stop-color="#1e293b"/>
+                <stop offset="1" stop-color="#0f172a"/>
+              </linearGradient>
+            </defs>
+            <!-- ראש מרובע ענק המהווה שליש מהגוף + גב מקומט וגבשושית במקום סנפיר גב -->
+            <path d="M24 44C24 36 32 33 58 33C92 33 122 39 148 45L155 41L162 47L169 44L175 50C194 55 210 61 224 50C231 44 242 36 246 41C249 46 237 58 231 64C240 68 250 77 244 82C238 86 227 76 220 71C194 82 152 88 104 86L98 92L38 87C28 86 24 78 24 68V44Z" fill="url(#spermBody)" stroke="#a5b4fc" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- לסת תחתונה צרה וארוכה אופיינית לראשתן -->
+            <path d="M36 82H96L102 86" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/>
+            <!-- קמטי עור אופייניים על הגוף -->
+            <path d="M114 48C112 58 112 68 114 76M126 50C124 59 124 68 126 76M138 52C136 60 136 68 138 75" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round" opacity="0.55"/>
+            <!-- סנפיר חזה קטן ומעוגל -->
+            <path d="M102 74C96 86 86 94 80 91C75 88 83 78 92 73" fill="#1e293b" stroke="#a5b4fc" stroke-width="1.6"/>
+            <!-- עין ממוקמת נמוך ואחורה ביחס לראש -->
+            <circle cx="92" cy="65" r="2.2" fill="#e0e7ff"/>
+          </svg>
+        `
+      },
+      blue: {
+        title: "לווייתן כחול",
+        subtitle: "Blue Whale • הענק השקט בעל הנוכחות המונומנטלית",
+        emoji: "🌊",
+        wikiUrl: "https://he.wikipedia.org/wiki/%D7%9C%D7%95%D7%95%D7%99%D7%99%D7%AA%D7%9F_%D7%9B%D7%97%D7%95%D7%9C",
+        traits: ["שלווה ויציבות", "נוכחות לא מתאמצת", "קצב פנימי רגוע", "חוסן רגשי"],
+        description: "היצור הגדול ביותר שאי פעם חי על פני כדור הארץ, ובכל זאת – עדין, שקט ולא ממהר לשום מקום. את/ה משדר/ת יציבות, קרקוע ונוכחות רגועה שלא צריכה לצעוק כדי שיבחינו בה. התקשורת שלך עוברת בתדרים נמוכים ועמוקים – את/ה פחות מתחבר/ת לדרמות מהירות ומעדיפ/ה מרחבים פתוחים, אמת פשוטה וקצב חיים טבעי.",
+        vibe: "תדר באס עמוק ומרגיע, הליכה בקצב שלך, ונוכחות שמשרה ביטחון ושקט.",
+        svg: `
+          <svg viewBox="0 0 260 150" class="w-full h-full drop-shadow-[0_10px_22px_rgba(56,189,248,0.34)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="blueSleek" x1="14" y1="48" x2="245" y2="88" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#0284c7"/>
+                <stop offset="0.55" stop-color="#0369a1"/>
+                <stop offset="1" stop-color="#0c4a6e"/>
+              </linearGradient>
+            </defs>
+            <!-- גוף ארוך, הידרודינמי וצר מאוד אופייני ללווייתן כחול -->
+            <path d="M14 72C20 56 62 49 124 50C156 50 182 53 196 55L201 48C203 46 206 47 206 51L207 57C220 59 230 57 240 48C245 43 253 38 255 43C257 47 247 56 242 61C249 64 256 71 251 75C246 79 237 71 232 67C212 78 168 85 108 85C54 85 12 81 14 72Z" fill="url(#blueSleek)" stroke="#7dd3fc" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- חריצי גרון ארוכים (Ventral grooves) -->
+            <path d="M26 75C58 79 96 81 134 80M34 79C64 82 98 84 128 83" stroke="#bae6fd" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+            <!-- כתמים כחולים-אפרפרים מנומרים אופייניים על הגב -->
+            <ellipse cx="95" cy="59" rx="7" ry="2.2" fill="#7dd3fc" opacity="0.35"/>
+            <ellipse cx="122" cy="61" rx="9" ry="2.5" fill="#7dd3fc" opacity="0.3"/>
+            <ellipse cx="148" cy="60" rx="6" ry="2" fill="#7dd3fc" opacity="0.35"/>
+            <!-- סנפיר חזה דק ומחודד -->
+            <path d="M84 78C76 92 62 103 54 101C49 99 60 86 71 77" fill="#0369a1" stroke="#7dd3fc" stroke-width="1.6"/>
+            <circle cx="48" cy="68" r="2" fill="#f0f9ff"/>
+          </svg>
+        `
+      },
+      beluga: {
+        title: "בלוגה (לבנתן)",
+        subtitle: "Beluga Whale • הקשקשן החברתי והשובב",
+        emoji: "🤍",
+        wikiUrl: "https://he.wikipedia.org/wiki/%D7%91%D7%9C%D7%95%D7%92%D7%94",
+        traits: ["תקשורתיות גבוהה", "הומור וקלילות", "גמישות חברתית", "אנרגיה מרימה"],
+        description: "הבלוגה מכונה 'הכנרית של הים' בזכות המגוון האינסופי של הצלילים, השריקות וההבעות שלה – וזה לגמרי את/ה. את/ה אדם חברותי, קליל, מלא הומור וסקרנות אנושית. קל לך להתחבר לאנשים חדשים, להכניס חמימות לכל חדר, ולייצר אווירה פתוחה ונעימה. החיים בשבילך הם מרחב של שיח, משחק וחיבורים אנושיים.",
+        vibe: "קלילות, סקרנות חברתית, הומור וחיבור מיידי עם אנשים סביבך.",
+        svg: `
+          <svg viewBox="0 0 260 150" class="w-full h-full drop-shadow-[0_10px_22px_rgba(224,242,254,0.35)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="belugaWhite" x1="30" y1="38" x2="225" y2="90" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.65" stop-color="#e0f2fe"/>
+                <stop offset="1" stop-color="#bae6fd"/>
+              </linearGradient>
+            </defs>
+            <!-- מצח מעוגל ובולט (Melon), צוואר גמיש, וללא סנפיר גב (אופייני לבלוגה!) -->
+            <path d="M26 73C26 68 31 66 35 65C36 49 48 39 68 39C98 39 144 45 184 57C198 61 212 54 224 44C230 39 239 35 242 40C244 45 233 56 227 62C236 66 245 75 239 80C234 84 223 75 216 70C188 83 142 90 92 89C56 88 26 82 26 73Z" fill="url(#belugaWhite)" stroke="#e0f2fe" stroke-width="1.8" stroke-linejoin="round"/>
+            <!-- חיוך אופייני של בלוגה -->
+            <path d="M28 73C38 77 48 76 56 72" stroke="#0284c7" stroke-width="1.8" stroke-linecap="round"/>
+            <!-- קפל צוואר עדין (לבלוגה חוליות צוואר לא מאוחות שמאפשרות להזיז את הראש) -->
+            <path d="M74 44C72 54 72 68 75 78" stroke="#93c5fd" stroke-width="1.3" stroke-linecap="round" opacity="0.65"/>
+            <!-- סנפיר חזה קצר, רחב ומעוגל בקצה -->
+            <path d="M94 78C90 92 78 102 70 99C64 96 71 84 82 77" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.7"/>
+            <circle cx="54" cy="62" r="2.4" fill="#0f172a"/>
+          </svg>
+        `
+      }
+    };
+
+    // --- ניהול מצב השאלון ---
+    let currentQuestionIndex = 0;
+    let shuffledQuestions = []; // שומר עותק של השאלות עם תשובות מעורבבות לכל הפעלה
+    let userAnswers = []; // שומר את אינדקס התשובה המעורבבת שנבחרה בכל שאלה
+    let currentWinningWhaleKey = 'humpback';
+
+    // --- מנוע סאונד אקוסטי תת-ימי בסגנון Melodic Dub Techno / Deep House + שירת לווייתנים ---
+    // מייצר גרוב עמוק (124 BPM) עם קיק חם, בס מתגלגל, היי-האטס ואקורד דאב מעל קריאות לווייתנים
+    const WhaleSoundEngine = {
+      ctx: null,
+      masterGain: null,
+      delaySend: null,
+      isPlaying: false,
+      callTimer: null,
+      sequencerTimer: null,
+      step: 0,
+      bpm: 124,
+      noiseBuffer: null,
+      realWhaleAudio: null,
+
+      // אתחול גרף האודיו בפעם הראשונה שהמשתמש מבצע אינטראקציה
+      init() {
+        if (this.ctx) return;
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioContextClass();
+
+        // יצירת ערוץ מאסטר לשליטה חלקה בעוצמה
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
+        this.masterGain.connect(this.ctx.destination);
+
+        // טעינת הקלטה אמיתית של שירת לווייתן גדול-סנפיר (Wikimedia Commons)
+        this.realWhaleAudio = new Audio('https://upload.wikimedia.org/wikipedia/commons/6/61/Humpback_whale_song.ogg');
+        this.realWhaleAudio.loop = true;
+        this.realWhaleAudio.volume = 0.55;
+        this.realWhaleAudio.crossOrigin = 'anonymous';
+
+        // יצירת באפר רעש חום עבור זרמי מעמקים, קלאפים והיי-האטס
+        const bufferSize = this.ctx.sampleRate * 4;
+        this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const output = this.noiseBuffer.getChannelData(0);
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          output[i] = (lastOut + 0.02 * white) / 1.02;
+          lastOut = output[i];
+          output[i] *= 2.8;
+        }
+
+        // דיליי מסונכרן לקצב (3/16 Dotted Eighth) עבור אקורדים וקריאות לווייתנים
+        const stepDuration = (60 / this.bpm) / 4; // אורך של חלק 16
+        const delay = this.ctx.createDelay(2.0);
+        delay.delayTime.setValueAtTime(stepDuration * 3, this.ctx.currentTime);
+
+        const feedback = this.ctx.createGain();
+        feedback.gain.setValueAtTime(0.42, this.ctx.currentTime);
+
+        const delayFilter = this.ctx.createBiquadFilter();
+        delayFilter.type = 'lowpass';
+        delayFilter.frequency.setValueAtTime(950, this.ctx.currentTime);
+
+        const wetGain = this.ctx.createGain();
+        wetGain.gain.setValueAtTime(0.42, this.ctx.currentTime);
+
+        delay.connect(delayFilter);
+        delayFilter.connect(feedback);
+        feedback.connect(delay);
+        delayFilter.connect(wetGain);
+        wetGain.connect(this.masterGain);
+
+        this.delaySend = delay;
+
+        this._startUnderwaterBed();
+      },
+
+      // שכבת רקע של זרמי מים עמוקים (Filtered Brown Noise + LFO)
+      _startUnderwaterBed() {
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = this.noiseBuffer;
+        noise.loop = true;
+
+        const lowpass = this.ctx.createBiquadFilter();
+        lowpass.type = 'lowpass';
+        lowpass.frequency.setValueAtTime(160, this.ctx.currentTime);
+
+        const lfo = this.ctx.createOscillator();
+        const lfoGain = this.ctx.createGain();
+        lfo.frequency.setValueAtTime(0.08, this.ctx.currentTime);
+        lfoGain.gain.setValueAtTime(55, this.ctx.currentTime);
+        lfo.connect(lfoGain);
+        lfoGain.connect(lowpass.frequency);
+
+        const bedGain = this.ctx.createGain();
+        bedGain.gain.setValueAtTime(0.14, this.ctx.currentTime);
+
+        noise.connect(lowpass);
+        lowpass.connect(bedGain);
+        bedGain.connect(this.masterGain);
+
+        noise.start(0);
+        lfo.start(0);
+      },
+
+      // סינתזה של קיק טכנו/דיפ-האוס עגול וחם
+      _triggerKick(time) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(125, time);
+        osc.frequency.exponentialRampToValueAtTime(44, time + 0.13);
+
+        gain.gain.setValueAtTime(0.001, time);
+        gain.gain.linearRampToValueAtTime(0.52, time + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.36);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(time);
+        osc.stop(time + 0.38);
+      },
+
+      // קלאפ / סנר האוסי חם ורך על פעימות 2 ו-4
+      _triggerClap(time) {
+        const src = this.ctx.createBufferSource();
+        src.buffer = this.noiseBuffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1150, time);
+        filter.Q.setValueAtTime(1.4, time);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.001, time);
+        gain.gain.linearRampToValueAtTime(0.14, time + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+
+        src.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+        gain.connect(this.delaySend);
+
+        src.start(time, Math.random() * 2, 0.2);
+      },
+
+      // בס מתגלגל (Rolling Bassline) שמניע את הקצב קדימה
+      _triggerBass(time, freq, duration) {
+        const osc = this.ctx.createOscillator();
+        const filter = this.ctx.createBiquadFilter();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, time);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(290, time);
+        filter.frequency.exponentialRampToValueAtTime(110, time + duration);
+
+        gain.gain.setValueAtTime(0.001, time);
+        gain.gain.linearRampToValueAtTime(0.28, time + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(time);
+        osc.stop(time + duration + 0.02);
+      },
+
+      // היי-האט עדין ומסונן (Off-beat & syncopated groove)
+      _triggerHat(time, isOpen) {
+        const src = this.ctx.createBufferSource();
+        src.buffer = this.noiseBuffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(6200, time);
+
+        const gain = this.ctx.createGain();
+        const peak = isOpen ? 0.095 : 0.04;
+        const decay = isOpen ? 0.15 : 0.045;
+
+        gain.gain.setValueAtTime(0.001, time);
+        gain.gain.linearRampToValueAtTime(peak, time + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + decay);
+
+        src.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.masterGain);
+
+        src.start(time, Math.random() * 2, decay + 0.02);
+      },
+
+      // אקורד דאב-טכנו מינורי מרחף שנכנס לדיליי
+      _triggerDubChord(time) {
+        // אקורד Fm9 עמוק (F3, Ab3, C4, Eb4, G4)
+        const freqs = [174.61, 207.65, 261.63, 311.13, 392.00];
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.Q.setValueAtTime(3.2, time);
+        filter.frequency.setValueAtTime(180, time);
+        filter.frequency.exponentialRampToValueAtTime(720, time + 0.12);
+        filter.frequency.exponentialRampToValueAtTime(210, time + 0.85);
+
+        const chordGain = this.ctx.createGain();
+        chordGain.gain.setValueAtTime(0.001, time);
+        chordGain.gain.linearRampToValueAtTime(0.055, time + 0.04);
+        chordGain.gain.exponentialRampToValueAtTime(0.001, time + 0.9);
+
+        freqs.forEach(f => {
+          const osc = this.ctx.createOscillator();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(f, time);
+          osc.detune.setValueAtTime((Math.random() - 0.5) * 10, time);
+          osc.connect(filter);
+          osc.start(time);
+          osc.stop(time + 0.95);
+        });
+
+        filter.connect(chordGain);
+        chordGain.connect(this.masterGain);
+        chordGain.connect(this.delaySend);
+      },
+
+      // סיקוונסר 16 צעדים (16th-note groove) ב-124 BPM
+      _startGroove() {
+        clearInterval(this.sequencerTimer);
+        this.step = 0;
+        const stepMs = (60 / this.bpm / 4) * 1000;
+
+        // תווי בס בסולם פה מינור (F1 = 43.65Hz, Ab1 = 51.91Hz, G1 = 49.00Hz, Eb1 = 38.89Hz)
+        const bassPattern = {
+          2: 43.65,
+          3: 43.65,
+          6: 43.65,
+          10: 51.91,
+          11: 49.00,
+          14: 38.89,
+          15: 43.65
+        };
+
+        const runStep = () => {
+          if (!this.isPlaying || !this.ctx) return;
+          const now = this.ctx.currentTime;
+          const s = this.step % 16;
+
+          // קיק 4/4 יציב (צעדים 0, 4, 8, 12)
+          if (s % 4 === 0) {
+            this._triggerKick(now);
+          }
+
+          // קלאפ רך על פעמות 2 ו-4 (צעדים 4 ו-12)
+          if (s === 4 || s === 12) {
+            this._triggerClap(now);
+          }
+
+          // בס מתגלגל
+          if (bassPattern[s]) {
+            this._triggerBass(now, bassPattern[s], 0.19);
+          }
+
+          // היי-האט פתוח באוף-ביט (2, 6, 10, 14) והיי-האט סגור עדין בצעדים זוגיים/סינקופות
+          if (s % 4 === 2) {
+            this._triggerHat(now, true);
+          } else if (s === 7 || s === 11 || s === 15) {
+            this._triggerHat(now, false);
+          }
+
+          // אקורד דאב-טכנו כל 2 תיבות (פעם ב-32 צעדים, בצעד ה-6)
+          if (this.step % 32 === 6) {
+            this._triggerDubChord(now);
+          }
+
+          this.step++;
+        };
+
+        runStep();
+        this.sequencerTimer = setInterval(runStep, stepMs);
+      },
+
+      // סינתזה אורגנית וחמה של קריאת לווייתן (ללא אפקט "טרמין/רוח רפאים")
+      playWhaleCall() {
+        if (!this.ctx || !this.isPlaying) return;
+        const now = this.ctx.currentTime;
+
+        // תדרים נמוכים ועמוקים יותר שמדמים תהודת גוף של לווייתן אמיתי (באוקטבת F2–C4)
+        const callPatterns = [
+          { startFreq: 174.61, midFreq: 233.08, endFreq: 130.81, duration: 3.4 }, // F3 -> Bb3 -> C3 (נהמה עמוקה שעולה ויורדת)
+          { startFreq: 261.63, midFreq: 174.61, endFreq: 155.56, duration: 3.1 }, // C4 -> F3 -> Eb3
+          { startFreq: 130.81, midFreq: 207.65, endFreq: 174.61, duration: 3.6 }  // C3 -> Ab3 -> F3
+        ];
+        const pattern = callPatterns[Math.floor(Math.random() * callPatterns.length)];
+        const dur = pattern.duration;
+
+        // שימוש בגל משולש + מסנן תהודה (Bandpass) ליצירת גוון ווקאלי/אורגני ולא סינוס צורם
+        const osc1 = this.ctx.createOscillator();
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(pattern.startFreq, now);
+        osc1.frequency.exponentialRampToValueAtTime(pattern.midFreq, now + dur * 0.4);
+        osc1.frequency.exponentialRampToValueAtTime(pattern.endFreq, now + dur);
+
+        const osc2 = this.ctx.createOscillator();
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(pattern.startFreq * 2, now);
+        osc2.frequency.exponentialRampToValueAtTime(pattern.midFreq * 2, now + dur * 0.4);
+        osc2.frequency.exponentialRampToValueAtTime(pattern.endFreq * 2, now + dur);
+
+        // מסנן פורמנטי שמעניק תחושה של תהודה תת-ימית טבעית
+        const formantFilter = this.ctx.createBiquadFilter();
+        formantFilter.type = 'lowpass';
+        formantFilter.Q.setValueAtTime(4.5, now);
+        formantFilter.frequency.setValueAtTime(320, now);
+        formantFilter.frequency.exponentialRampToValueAtTime(580, now + dur * 0.4);
+        formantFilter.frequency.exponentialRampToValueAtTime(260, now + dur);
+
+        const callGain = this.ctx.createGain();
+        callGain.gain.setValueAtTime(0.0001, now);
+        callGain.gain.linearRampToValueAtTime(0.16, now + dur * 0.22);
+        callGain.gain.setValueAtTime(0.14, now + dur * 0.6);
+        callGain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        const harmGain = this.ctx.createGain();
+        harmGain.gain.setValueAtTime(0.035, now);
+
+        osc1.connect(formantFilter);
+        osc2.connect(harmGain);
+        harmGain.connect(formantFilter);
+        formantFilter.connect(callGain);
+
+        callGain.connect(this.masterGain);
+        callGain.connect(this.delaySend);
+
+        osc1.start(now);
+        osc2.start(now);
+
+        osc1.stop(now + dur + 0.1);
+        osc2.stop(now + dur + 0.1);
+      },
+
+      // סינתזה של קריאת לווייתן הרמונית המותאמת סולמית ל-Fm מעל הגרוב
+      playWhaleCall() {
+        if (!this.ctx || !this.isPlaying) return;
+        const now = this.ctx.currentTime;
+
+        // מוטיבים הרמוניים בסולם פה מינור (F, Ab, Bb, C, Eb) כך שישתלבו טבעית במוזיקה
+        const callPatterns = [
+      // סינתזה אורגנית וחמה של קריאת לווייתן לגיבוי (ללא אפקט "טרמין/רוח רפאים")
+      playWhaleCall() {
+        if (!this.ctx || !this.isPlaying) return;
+        const now = this.ctx.currentTime;
+
+        const callPatterns = [
+          { startFreq: 174.61, midFreq: 233.08, endFreq: 130.81, duration: 3.4 },
+          { startFreq: 261.63, midFreq: 174.61, endFreq: 155.56, duration: 3.1 },
+          { startFreq: 130.81, midFreq: 207.65, endFreq: 174.61, duration: 3.6 }
+        ];
+        const pattern = callPatterns[Math.floor(Math.random() * callPatterns.length)];
+        const dur = pattern.duration;
+
+        const osc1 = this.ctx.createOscillator();
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(pattern.startFreq, now);
+        osc1.frequency.exponentialRampToValueAtTime(pattern.midFreq, now + dur * 0.4);
+        osc1.frequency.exponentialRampToValueAtTime(pattern.endFreq, now + dur);
+
+        const osc2 = this.ctx.createOscillator();
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(pattern.startFreq * 2, now);
+        osc2.frequency.exponentialRampToValueAtTime(pattern.midFreq * 2, now + dur * 0.4);
+        osc2.frequency.exponentialRampToValueAtTime(pattern.endFreq * 2, now + dur);
+
+        const formantFilter = this.ctx.createBiquadFilter();
+        formantFilter.type = 'lowpass';
+        formantFilter.Q.setValueAtTime(4.5, now);
+        formantFilter.frequency.setValueAtTime(320, now);
+        formantFilter.frequency.exponentialRampToValueAtTime(580, now + dur * 0.4);
+        formantFilter.frequency.exponentialRampToValueAtTime(260, now + dur);
+
+        const callGain = this.ctx.createGain();
+        callGain.gain.setValueAtTime(0.0001, now);
+        callGain.gain.linearRampToValueAtTime(0.16, now + dur * 0.22);
+        callGain.gain.setValueAtTime(0.14, now + dur * 0.6);
+        callGain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        const harmGain = this.ctx.createGain();
+        harmGain.gain.setValueAtTime(0.035, now);
+
+        osc1.connect(formantFilter);
+        osc2.connect(harmGain);
+        harmGain.connect(formantFilter);
+        formantFilter.connect(callGain);
+
+        callGain.connect(this.masterGain);
+        callGain.connect(this.delaySend);
+
+        osc1.start(now);
+        osc2.start(now);
+
+        osc1.stop(now + dur + 0.1);
+        osc2.stop(now + dur + 0.1);
+      },
+
+      // תזמון מחזורי טבעי של קריאות לווייתנים מעל המקצב
+      _scheduleCalls() {
+        clearTimeout(this.callTimer);
+        if (!this.isPlaying) return;
+        const nextInterval = Math.random() * 4000 + 5200;
+        this.callTimer = setTimeout(() => {
+          this.playWhaleCall();
+          this._scheduleCalls();
+        }, nextInterval);
+      },
+
+      // הפעלה חלקה (Fade-in)
+      start() {
+        try {
+          this.init();
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+          if (!this.isPlaying) {
+            this.isPlaying = true;
+            const now = this.ctx.currentTime;
+            this.masterGain.gain.cancelScheduledValues(now);
+            this.masterGain.gain.setValueAtTime(Math.max(this.masterGain.gain.value, 0.0001), now);
+            this.masterGain.gain.exponentialRampToValueAtTime(0.85, now + 1.1);
+
+            this._startGroove();
+
+            // ניגון הקלטת הלווייתן האמיתית מעל הביט; אם נחסם – מעבר אוטומטי לגיבוי מובנה
+            if (this.realWhaleAudio) {
+              this.realWhaleAudio.play().catch(() => {
+                setTimeout(() => this.playWhaleCall(), 900);
+                this._scheduleCalls();
+              });
+            }
+          }
+          updateAudioUI(true);
+        } catch (e) {
+          // טיפול שקט במקרה של חסימת אודיו בדפדפן
+        }
+      },
+
+      // השהיה חלקה (Fade-out)
+      stop() {
+        if (!this.ctx || !this.isPlaying) return;
+        this.isPlaying = false;
+        clearTimeout(this.callTimer);
+        clearInterval(this.sequencerTimer);
+        if (this.realWhaleAudio) {
+          this.realWhaleAudio.pause();
+        }
+        const now = this.ctx.currentTime;
+        this.masterGain.gain.cancelScheduledValues(now);
+        this.masterGain.gain.setValueAtTime(Math.max(this.masterGain.gain.value, 0.0001), now);
+        this.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+        updateAudioUI(false);
+      },
+
+      toggle() {
+        if (this.isPlaying) {
+          this.stop();
+        } else {
+          this.start();
+        }
+      }
+    };
+
+    // עדכון מצב כפתור השמע בפינה העליונה
+    function updateAudioUI(isOn) {
+      const iconOff = document.getElementById('icon-sound-off');
+      const iconOn = document.getElementById('icon-sound-on');
+      const pulseDot = document.getElementById('audio-pulse-dot');
+      const label = document.getElementById('audio-status-label');
+
+      if (isOn) {
+        iconOff.classList.add('hidden');
+        iconOn.classList.remove('hidden');
+        pulseDot.classList.remove('hidden');
+        label.textContent = 'סאונד פעיל';
+      } else {
+        iconOn.classList.add('hidden');
+        iconOff.classList.remove('hidden');
+        pulseDot.classList.add('hidden');
+        label.textContent = 'סאונד כבוי';
+      }
+    }
+
+    function toggleAudio() {
+      WhaleSoundEngine.toggle();
+    }
+
+    // פונקציית Fisher-Yates לערבוב אקראי אמיתי של מערך
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // יצירת בועות צפות עדינות ברקע האוקיינוס
+    function createBubbles() {
+      const container = document.getElementById('bubbles-container');
+      if (!container) return;
+      container.innerHTML = '';
+      const bubbleCount = 18;
+      for (let i = 0; i < bubbleCount; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        const size = Math.random() * 14 + 5;
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+        bubble.style.left = `${Math.random() * 100}%`;
+        bubble.style.animationDuration = `${Math.random() * 12 + 10}s`;
+        bubble.style.animationDelay = `${Math.random() * 10}s`;
+        container.appendChild(bubble);
+      }
+    }
+
+    // התחלת השאלון וערבוב מחדש של התשובות בכל שאלה
+    function startQuiz() {
+      // הפעלה אוטומטית של סאונד המעמקים ברגע הלחיצה הראשונה
+      if (!WhaleSoundEngine.isPlaying) {
+        WhaleSoundEngine.start();
+      }
+
+      currentQuestionIndex = 0;
+      userAnswers = [];
+      shuffledQuestions = questions.map(q => ({
+        question: q.question,
+        options: shuffleArray(q.options)
+      }));
+
+      document.getElementById('welcome-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.add('hidden');
+      const quizScreen = document.getElementById('quiz-screen');
+      quizScreen.classList.remove('hidden');
+      renderQuestion();
+    }
+
+    // הצגת השאלה הנוכחית
+    function renderQuestion() {
+      const q = shuffledQuestions[currentQuestionIndex];
+      const total = shuffledQuestions.length;
+      const percent = Math.round(((currentQuestionIndex + 1) / total) * 100);
+
+      document.getElementById('question-counter').textContent = `שאלה ${currentQuestionIndex + 1} מתוך ${total}`;
+      document.getElementById('progress-percent').textContent = `${percent}%`;
+      document.getElementById('progress-bar').style.width = `${percent}%`;
+
+      const questionTextEl = document.getElementById('question-text');
+      questionTextEl.textContent = q.question;
+
+      // הצגה/הסתרה של כפתור חזרה
+      const backBtn = document.getElementById('back-btn');
+      if (currentQuestionIndex === 0) {
+        backBtn.classList.add('invisible');
+      } else {
+        backBtn.classList.remove('invisible');
+      }
+
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((option, idx) => {
+        const isSelected = userAnswers[currentQuestionIndex] === idx;
+        const btn = document.createElement('button');
+        btn.className = `option-btn w-full text-right p-4 sm:p-5 rounded-2xl text-sm sm:text-base text-sky-50 leading-relaxed flex items-start gap-3.5 cursor-pointer ${
+          isSelected ? 'ring-2 ring-teal-400 bg-sky-900/70' : ''
+        }`;
+
+        const badge = document.createElement('span');
+        badge.className = 'flex-shrink-0 w-7 h-7 rounded-full bg-sky-400/15 border border-sky-300/25 text-sky-200 text-xs font-bold flex items-center justify-center mt-0.5';
+        const letters = ['א', 'ב', 'ג', 'ד', 'ה'];
+        badge.textContent = letters[idx];
+
+        const textSpan = document.createElement('span');
+        textSpan.textContent = option.text;
+
+        btn.appendChild(badge);
+        btn.appendChild(textSpan);
+        btn.onclick = () => selectOption(idx);
+
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    // בחירת תשובה ומעבר לשאלה הבאה
+    function selectOption(optionIndex) {
+      userAnswers[currentQuestionIndex] = optionIndex;
+
+      if (currentQuestionIndex < shuffledQuestions.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion();
+      } else {
+        calculateAndShowResult();
+      }
+    }
+
+    // חזרה לשאלה הקודמת
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    }
+
+    // חישוב התוצאה והצגת המסך הסופי
+    function calculateAndShowResult() {
+      const totals = {
+        humpback: 0,
+        orca: 0,
+    // חישוב התוצאה והצגת המסך הסופי (כולל שובר שוויון אקראי הוגן)
+    function calculateAndShowResult() {
+      const totals = {
+        humpback: 0,
+        orca: 0,
+        sperm: 0,
+        blue: 0,
+        beluga: 0
+      };
+
+      userAnswers.forEach((answerIdx, qIdx) => {
+        const chosenOption = shuffledQuestions[qIdx].options[answerIdx];
+        if (chosenOption && chosenOption.scores) {
+          for (const [whaleKey, pts] of Object.entries(chosenOption.scores)) {
+            totals[whaleKey] += pts;
+          }
+        }
+      });
+
+      // מציאת הניקוד המקסימלי ואיסוף כל הלווייתנים שחולקים אותו (מניעת הטיה בתיקו)
+      const maxScore = Math.max(...Object.values(totals));
+      const tiedWinners = Object.keys(totals).filter(key => totals[key] === maxScore);
+      const bestKey = tiedWinners[Math.floor(Math.random() * tiedWinners.length)];
+
+      currentWinningWhaleKey = bestKey;
+      const whale = whales[bestKey];
+
+      document.getElementById('quiz-screen').classList.add('hidden');
+      const resultScreen = document.getElementById('result-screen');
+      resultScreen.classList.remove('hidden');
+
+      document.getElementById('result-illustration').innerHTML = whale.svg;
+      document.getElementById('result-title').textContent = `${whale.title} ${whale.emoji}`;
+      document.getElementById('result-subtitle').textContent = whale.subtitle;
+      document.getElementById('result-description').textContent = whale.description;
+      document.getElementById('result-vibe').textContent = whale.vibe;
+      document.getElementById('wiki-link').href = whale.wikiUrl;
+
+      const traitsContainer = document.getElementById('result-traits');
+      traitsContainer.innerHTML = '';
+      whale.traits.forEach(trait => {
+        const pill = document.createElement('span');
+        pill.className = 'text-xs font-medium bg-sky-400/15 border border-sky-300/25 text-sky-100 px-3 py-1 rounded-full';
+        pill.textContent = trait;
+        traitsContainer.appendChild(pill);
+      });
+
+      // בדיקה האם הדפדפן תומך ב-Web Share API (נפוץ במובייל)
+      if (navigator.share) {
+        document.getElementById('native-share-btn').classList.remove('hidden');
+      }
+    }
+
+    // יצירת טקסט השיתוף המעוצב לוואטסאפ
+    function buildShareMessage() {
+      const whale = whales[currentWinningWhaleKey];
+      const currentUrl = window.location.href.startsWith('http') ? `\nבואו לבדוק איזה לווייתן אתם:\n${window.location.href}` : '';
+      return `עשיתי את שאלון הלווייתנים ויצאתי: *${whale.title}* ${whale.emoji}\n(${whale.subtitle})\n\n${whale.vibe}${currentUrl}`;
+    }
+
+    // העתקה ללוח (Clipboard) עם תמיכה מלאה ב-iframe ובמובייל
+    function copyShareText() {
+      const text = buildShareMessage();
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('התוצאה הועתקה! עכשיו אפשר להדביק בוואטסאפ 🐋');
+      } catch (err) {
+        showToast('לא הצלחנו להעתיק אוטומטית, נסה לשתף דרך הכפתור');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    // שיתוף ישיר דרך המכשיר (מובייל)
+    async function nativeShare() {
+      const whale = whales[currentWinningWhaleKey];
+      try {
+        await navigator.share({
+          title: 'איזה סוג לווייתן אתה?',
+          text: buildShareMessage(),
+          url: window.location.href.startsWith('http') ? window.location.href : undefined
+        });
+      } catch (err) {
+        // המשתמש ביטל את השיתוף
+      }
+    }
+
+    // הורדת השאלון כקובץ HTML עצמאי להפצה/אירוח
+    function downloadQuizHtml() {
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'which-whale-are-you.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('הקובץ ירד למכשיר! אפשר לשלוח או להעלות אותו ללינק 🌊');
+    }
+
+    // הפעלה מחדש של השאלון
+    function restartQuiz() {
+      startQuiz();
+    }
+
+    // הצגת הודעת Toast
+    let toastTimeout;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-3');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-3');
+      }, 3200);
+    }
+
+    // אתחול בועות בעליית העמוד
+    window.addEventListener('DOMContentLoaded', createBubbles);
+  </script>
+</body>
+</html>
